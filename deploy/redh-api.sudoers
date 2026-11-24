@@ -1,0 +1,16 @@
+# Enter it with: sudo visudo -f /etc/sudoers.d/redh-api
+# That file name has no dot on purpose: sudo skips files in sudoers.d whose
+# name contains one.
+#
+# The commands get a fixed PATH. Not every system sets secure_path, and
+# without it sudo passes on the caller's PATH: whoever runs as redh-api could
+# hand redh-shut a systemctl of their own.
+Defaults:redh-api secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# redh-api may run /usr/local/bin/redh-shut as root, without a password and
+# without arguments (that is what the "" says).
+redh-api ALL=(root) NOPASSWD: /usr/local/bin/redh-shut ""
+
+# For GET /v1/apps: redh-manager's list of apps, as JSON, with exactly these
+# arguments and no others. On a server without redh-manager it does nothing.
+redh-api ALL=(root) NOPASSWD: /usr/local/bin/redh list --json

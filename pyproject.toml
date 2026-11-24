@@ -1,0 +1,29 @@
+[build-system]
+requires = ["flit_core >=3.12,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "redh-api"
+dynamic = ["version", "description"]
+readme = "README.md"
+requires-python = ">=3.9"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+dependencies = []
+classifiers = [
+    "Environment :: No Input/Output (Daemon)",
+    "Intended Audience :: System Administrators",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Systems Administration",
+]
+
+[project.scripts]
+redh-api = "redh_api.cli:main"
+
+[tool.flit.module]
+name = "redh_api"
+
+[tool.flit.sdist]
+include = ["tests/", "deploy/", "redh-api.conf.example"]
+exclude = ["dev.conf"]

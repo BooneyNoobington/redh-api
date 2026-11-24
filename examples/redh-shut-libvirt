@@ -1,0 +1,38 @@
+#!/bin/sh
+# redh-shut for a server with virtual machines under libvirt: an example to
+# adapt, described in RedhAPI's README under "Servers with virtual machines".
+#
+# It asks every running guest to shut down, and powers the server off once all
+# of them are off. A guest still running after WAIT seconds keeps the server
+# up: redh-shut fails and names it, and the app shows that. No guest is ever
+# destroyed.
+set -eu
+
+# Seconds for all guests together. The app waits three minutes for a server to
+# go down, and this leaves room within them.
+WAIT=120
+
+export LIBVIRT_DEFAULT_URI=qemu:///system
+
+# One name per line; virsh's empty last line is dropped by $( ).
+guests=$(virsh list --name)
+if [ -n "$guests" ]; then
+    printf '%s\n' "$guests" | while IFS= read -r guest; do
+        # virsh asks the guest agent if the guest has its channel, and presses
+        # the power button otherwise. A guest it can't ask shows up below.
+        virsh shutdown "$guest" || true
+    done
+fi
+
+deadline=$(($(date +%s) + WAIT))
+while [ -n "$guests" ]; do
+    if [ "$(date +%s)" -ge "$deadline" ]; then
+        names=$(printf '%s\n' "$guests" | awk '{ printf "%s%s", (NR > 1 ? ", " : ""), $0 }')
+        echo "$names didn't shut down within $WAIT seconds" >&2
+        exit 1
+    fi
+    sleep 2
+    guests=$(virsh list --name)
+done
+
+systemctl poweroff

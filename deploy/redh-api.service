@@ -1,0 +1,25 @@
+# /etc/systemd/system/redh-api.service
+#
+# RedhAPI runs as its own unprivileged user. It reaches root only through the
+# one sudo rule for redh-shut.
+#
+# It is not sandboxed any further, on purpose: redh-shut runs as a child of
+# this service, inside the same sandbox. NoNewPrivileges= and every option
+# that implies it stop sudo from working, and the file system options would
+# hide or lock parts of the system from redh-shut as well.
+
+[Unit]
+Description=RedhAPI: status and shutdown for Redh Control
+After=network.target
+
+[Service]
+Type=simple
+User=redh-api
+Group=redh-api
+ExecStart=/usr/local/bin/redh-api serve --config /etc/redh-api/redh-api.conf
+Restart=on-failure
+RestartSec=5
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+# /etc/sysusers.d/redh-api.conf, then: sudo systemd-sysusers
+# A system user and group for RedhAPI, without a login or a home directory.
+u redh-api - "RedhAPI"

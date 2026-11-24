@@ -1,0 +1,12 @@
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.egg-info/
+
+# A local config for trying RedhAPI out: it holds token hashes
+dev.conf

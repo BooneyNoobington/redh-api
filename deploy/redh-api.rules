@@ -1,0 +1,7 @@
+# /etc/udev/rules.d/90-redh-api.rules, optional: lets RedhAPI read the
+# processor's energy counters (RAPL), for the power in GET /v1/system. Since
+# Linux 5.10 they are root's alone, because fast readings of them leak what
+# the processor does. RedhAPI reads them at most every 5 seconds, and this
+# rule gives them to its group only, whenever the kernel adds a counter.
+
+ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:*", RUN+="/usr/bin/chgrp redh-api /sys%p/energy_uj", RUN+="/usr/bin/chmod 0440 /sys%p/energy_uj"

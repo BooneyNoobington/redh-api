@@ -1,0 +1,52 @@
+# /etc/redh-api/redh-api.conf: root's, group redh-api, mode 640.
+# Only [tokens] needs an entry; every other value shown is the default.
+
+[api]
+# Where RedhAPI listens. Behind Caddy, a loopback address: RedhAPI speaks
+# plain HTTP, and Caddy serves it as https://rapi.SERVER.internal. With a
+# certificate of its own in [tls], any address of this server, such as
+# 0.0.0.0:8470 for all of them.
+listen = 127.0.0.1:8470
+
+# The name the status reports. Empty means the host name.
+name =
+
+[shutdown]
+# What sudo runs as root, without arguments. It must match the sudoers rule
+# exactly, and only root may be able to change the file.
+command = /usr/local/bin/redh-shut
+
+# Seconds between answering a shutdown request and running the command, so
+# the answer reaches the app before the server goes down.
+delay_seconds = 2
+
+[apps]
+# redh-manager's command, for GET /v1/apps. sudo runs it as root with the
+# arguments 'list --json'; it must match the sudoers rule exactly, and only
+# root may be able to change the file. Without it, the apps aren't offered.
+command = /usr/local/bin/redh
+
+[wake]
+# Where POST /v1/wake sends the magic packet that wakes another server: a
+# UDP broadcast to this address and port. 255.255.255.255 leaves the network
+# to the kernel; a server in several networks needs the broadcast address of
+# the one its sleepers are in, such as 192.168.1.255.
+broadcast = 255.255.255.255
+port = 9
+
+[system]
+# The file systems whose space GET /v1/system reports: one absolute path per
+# line, each further one indented, such as /srv/data under /.
+disks = /
+
+# [tls]
+# RedhAPI's own certificate and key, from 'sudo redh-api certificate', so that
+# it serves HTTPS itself, without Caddy, a DNS name or a CA. Redh Control then
+# trusts exactly this certificate, which the pairing codes of 'redh-api token'
+# carry. Without the section, RedhAPI speaks plain HTTP behind Caddy.
+# certificate = /etc/redh-api/tls.crt
+# key = /etc/redh-api/tls.key
+
+[tokens]
+# One line per client: a name for the journal, and the SHA-256 of its token.
+# 'redh-api token NAME' makes a token and prints its line.

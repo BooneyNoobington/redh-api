@@ -1,0 +1,7 @@
+# Caddy serves RedhAPI as https://rapi.SERVER.internal, with a certificate the
+# westfall snippet gets from the internal ACME CA. Replace SERVER with the
+# server's name; the port must match listen in /etc/redh-api/redh-api.conf.
+rapi.SERVER.internal {
+    import westfall
+    reverse_proxy 127.0.0.1:8470
+}
